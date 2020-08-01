@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
-# from django.views.decorators.csrf import csrf_exempt
+# from django.views.decorators.csrf import csrf_exempt, csrf_protect
 # from django.contrib.auth.decorators import login_required
 
 from myapp.models import Person
@@ -9,15 +9,21 @@ from myapp.models import Person
 import json
 
 # Create your views here.
-def index(request):
-	response = json.dumps([{}])
-	return HttpResponse(response, content_type='text/json')
+# def index(request):
+# 	response = json.dumps([{}])
+# 	return HttpResponse(response, content_type='text/json')
 
-# @csrf_exempt
+#@csrf_exempt
 def addPerson(request):
 	if request.method == 'POST':
-		#Gets json payload from request
+		# Gets json payload from request
 		json_payload = json.loads(request.body)
+		# print(json_payload['national_id'])
+		# print(json_payload['name'])
+		# print(json_payload['last_name'])
+		# print(json_payload['age'])
+		# print(json_payload['origin_planet'])
+		# print(json_payload['picture_url'])
 		#Captures every variable inside json payload
 		national_id   = json_payload['national_id']
 		name          = json_payload['name']
@@ -26,35 +32,38 @@ def addPerson(request):
 		origin_planet = json_payload['origin_planet']
 		picture_url   = json_payload['picture_url']
 			
-		#Create an object with new attributes
+		#Instanciates an object with attributes
 		person        = Person(national_id=national_id, name=name, last_name=last_name, age=age, 
 								origin_planet=origin_planet, picture_url=picture_url)
 			
 		try:
-			#attempt to save object to DB
+			#Attempts to save data to DB
 			person.save()
-			#Confirm object saved
+			#Confirms object saved
 			response = json.dumps([{'Success':'Status 201'}])
 		#if any error raises when saving to DB..
 		except:
-			response = json.dumps([{'Error':'Status 500'}])				
+			response = json.dumps([{'Error':'Status 500'}])
+		#response = json.dumps([{'Error':'Holaaaa'}])
+		#return JsonResponse(response, safe=False)
+		return HttpResponse(response, content_type='text/json')
 
-	return HttpResponse(response, content_type='text/json')
 
 
 
 
-def getPeople(request, national_id):
-	if request.method == 'GET':
-		try:
-			#Try to get the person using national_id as key
-			human    = Person.objects.get(national_id= national_id)
-			response = json.dumps([{'national_id':human.national_id, 'name':human.name, 
-									'last_name':human.last_name , 'age':human.age, 
-									'origin_planet':human.origin_planet, 'picture_url':human.picture_url}]) 
-		except:
-			response = json.dumps([{'Error':'Status 404'}])
+# def getPeople(request, national_id):
+# 	if request.method == 'GET':
+# 		try:
+# 			#Try to get the person using national_id as key
+# 			human    = Person.objects.get(national_id= national_id)
+# 			response = json.dumps([{'national_id':human.national_id, 'name':human.name, 
+# 									'last_name':human.last_name , 'age':human.age, 
+# 									'origin_planet':human.origin_planet, 'picture_url':human.picture_url}]) 
+# 		except:
+# 			response = json.dumps([{'Error':'Status 404'}])
 
-	return HttpResponse(response, content_type='text/json')
+# 	return HttpResponse(response, content_type='text/json')
+
 
 
