@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpRequest
 # from django.views.decorators.csrf   import csrf_exempt
 # from django.contrib.auth.decorators import login_required
 
@@ -11,19 +11,23 @@ import logging
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 logger = logging.getLogger('views.py')
-# Create your views here.
-# def index(request):
-# 	response = json.dumps([{}])
-# 	return HttpResponse(response, content_type='text/json')
 
-# @csrf_exempt
-# @login_required
+# Create your views here.
+
+def index(request):
+	# Index view, displays an empty json:
+	response = json.dumps([{}])
+	return HttpResponse(response, status= 200,content_type='text/json')
+
+
+
+
+
+
 def addPerson(request):
 	logger.debug("addPerson")
-	# Creates a non-empty response 
-	response = json.dumps([{"Error":"addPerson"}])
 
-	if request.method == 'POST':
+	if request.method == 'POST' and request.content_type == 'application/json':
 		# Gets json payload from request
 		json_payload = json.loads(request.body)
 		#Captures every variable inside json payload
@@ -42,19 +46,22 @@ def addPerson(request):
 			#Attempts to save data to DB
 			person.save()
 			#Confirms object saved
-			response = json.dumps([{'Success':'Status 201'}])
+			response = json.dumps(json_payload)
+			status   = 201
 		#If any error raises when saving to DB..
 		except:
-			response = json.dumps([{'Error':'Status 500'}])
+			response = json.dumps([{'Error':'Status 500 INTERNAL SERVER ERROR'}])
+			status   = 500
+	else:
+		response 	 = json.dumps([{'Error':'Status 400 Bad Request'}])
+		status 		 = 400
 	
-	return HttpResponse(response, content_type='text/json')
+	return HttpResponse(response, status=status ,content_type='text/json')
 
 
 
 def getPersonById(request, national_id):
-	logger.debug("Entrando a getPersonById")
-	# Creates a non-empty response 
-	response = json.dumps([{"Error":"getPersonById"}])
+	logger.debug("getPersonById")
 
 	if request.method == 'GET':
 		try:
@@ -63,19 +70,19 @@ def getPersonById(request, national_id):
 			response  = json.dumps([{'national_id':person.national_id, 'name':person.name, 
 									'last_name':person.last_name , 'age':person.age, 
 									'origin_planet':person.origin_planet, 'picture_url':person.picture_url}]) 
+			status    = 200
 		#If any error raises when saving to DB..
 		except:
 			response  = json.dumps([{'Error':'Status 404'}])
+			status 	  = 404
 
-	return HttpResponse(response, content_type='text/json')
+	return HttpResponse(response, status=status, content_type='text/json')
 
 
 
 
 def getAllPeople(request):
 	logger.debug("getAllPeople")
-	# Creates a non-empty response 
-	response = json.dumps([{"Error":"getAllPeople"}])
 
 	if request.method=='GET':
 		try:
@@ -83,21 +90,21 @@ def getAllPeople(request):
 			all_people    = Person.objects.all()
 			#Creates a json file with all records
 			response 	  = serializers.serialize('json',all_people) 
+			status 		  = 200
 		#If any error raises when saving to DB..
 		except:
-			response      = json.dumps([{'Error':'Status 404'}])
+			response      = json.dumps([{'Error':'Status 500 INTERNAL SERVER ERROR'}])
+			status 	  	  = 500			
 	
-	return HttpResponse(response, content_type='application/json')	
+	return HttpResponse(response, status=status, content_type='application/json')	
 
 
 
 
 def updatePerson(request, national_id):
 	logger.debug("updatePerson")
-	# Creates a non-empty response 
-	#response = json.dumps([{"Error":"updatePerson"}])
 	
-	if request.method=='PUT':
+	if request.method=='PUT' and request.content_type == 'application/json':
 		# Gets json payload from request
 		json_payload  = json.loads(request.body)
 		#Captures every variable inside Json payload
@@ -110,29 +117,33 @@ def updatePerson(request, national_id):
 
 		try:
 			# Looks for a person based on national_id 
-			person       = Person.objects.get(national_id=national_id)
+			person    = Person.objects.get(national_id=national_id)
 			# Updates a person based on national_id and a json
 			Person.objects.filter(national_id=national_id).update(national_id=nat_id, 
 														     	  name=name, last_name=last_name , age=age, 
 														     	  origin_planet=origin_planet, picture_url=picture_url)
-			response = json.dumps([{'Success':'Status 200'}])
+			response 	 = json.dumps(json_payload)
+			status   	 = 200
 		except Person.DoesNotExist:
 			#If person doesn't exist:
-			response = json.dumps([{'Error':'Status 404'}])
+			response 	 = json.dumps([{'Error':'Status 404'}])
+			status   	 = 404
 		finally:
 			# On any other errors:
 			if not response:
 				response = json.dumps([{'Error':'Status 500'}])
+				status   = 500
+	else:
+		response 		 = json.dumps([{'Error':'Status 400 Bad Request'}])
+		status 		 	 = 400
 
-	return HttpResponse(response, content_type='text/json')	
+	return HttpResponse(response, status=status, content_type='text/json')	
 
 
 
 
 def deletePerson(request, national_id):
 	logger.debug("deletePerson")
-	# Creates a non-empty response 
-	response = json.dumps([{"Error":"deletePerson"}])
 
 	if request.method=='DELETE':
 		try:
@@ -141,15 +152,18 @@ def deletePerson(request, national_id):
 			# Updates a person based on national_id and a json
 			person.delete()
 			response = json.dumps([{'Success':'Status 200'}])
+			status   = 200
 		except Person.DoesNotExist:
 			#If person doesn't exist:
 			response = json.dumps([{'Error':'Status 404'}])
+			status   = 404
 		finally:
 			# On any other errors:
 			if not response:
-				response = json.dumps([{'Error':'Status 500'}])
+				response = json.dumps([{'Error':'Status 500 INTERNAL SERVER ERROR'}])
+				status   = 500
 
-	return HttpResponse(response, content_type='text/json')	
+	return HttpResponse(response, status=status, content_type='text/json')	
 
 
 		

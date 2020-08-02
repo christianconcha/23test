@@ -19,7 +19,7 @@ from myapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('', views.index),
+    path('', views.index),
     path('post/people',views.addPerson),
     path('get/people/<str:national_id>',views.getPersonById),
     path('get/people',views.getAllPeople),
