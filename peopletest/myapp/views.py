@@ -95,7 +95,7 @@ def getAllPeople(request):
 def updatePerson(request, national_id):
 	logger.debug("updatePerson")
 	# Creates a non-empty response 
-	response = json.dumps([{"Error":"updatePerson"}])
+	#response = json.dumps([{"Error":"updatePerson"}])
 	
 	if request.method=='PUT':
 		# Gets json payload from request
@@ -119,9 +119,10 @@ def updatePerson(request, national_id):
 		except Person.DoesNotExist:
 			#If person doesn't exist:
 			response = json.dumps([{'Error':'Status 404'}])
-		else:
+		finally:
 			# On any other errors:
-			response = json.dumps([{'Error':'Status 500'}])
+			if not response:
+				response = json.dumps([{'Error':'Status 500'}])
 
 	return HttpResponse(response, content_type='text/json')	
 
@@ -143,9 +144,10 @@ def deletePerson(request, national_id):
 		except Person.DoesNotExist:
 			#If person doesn't exist:
 			response = json.dumps([{'Error':'Status 404'}])
-		else:
+		finally:
 			# On any other errors:
-			response = json.dumps([{'Error':'Status 500'}])
+			if not response:
+				response = json.dumps([{'Error':'Status 500'}])
 
 	return HttpResponse(response, content_type='text/json')	
 
