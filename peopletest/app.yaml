@@ -9,14 +9,6 @@ handlers:
 - url: .*
   script: mysite.wsgi.application
 
-# Only pure Python libraries can be vendored
-# Python libraries that use C extensions can
-# only be included if they are part of the App Engine SDK 
-# Using Third Party Libraries: https://cloud.google.com/appengine/docs/python/tools/using-libraries-python-27
-libraries:
-- name: MySQLdb
-  version: 1.2.5
-# [END django_app]
 
 # Google App Engine limits application deployments to 10,000 uploaded files per
 # version. The skip_files section allows us to skip virtual environment files
