@@ -1,0 +1,9 @@
+#requirements.txt
+python3 -V
+sudo apt-get update 
+sudo apt-get install python3-pip
+sudo pip3 install django==2.0
+sudo apt-get install git
+git clone https://github.com/christianconcha/23test
+#ubicar la carpeta con el archivo manage.py
+python3 manage.py runserver 

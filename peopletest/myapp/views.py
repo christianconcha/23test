@@ -1,7 +1,6 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse, HttpRequest
-# from django.views.decorators.csrf   import csrf_exempt
-# from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+
 
 from myapp.models import Person
 from django.core import serializers
@@ -22,8 +21,6 @@ def index(request):
 
 
 
-
-
 def addPerson(request):
 	logger.debug("addPerson")
 
@@ -38,7 +35,7 @@ def addPerson(request):
 		origin_planet = json_payload['origin_planet']
 		picture_url   = json_payload['picture_url']
 			
-		#Instanciates an object with attributes
+		#Instanciates the class Person to create a person object
 		person        = Person(national_id=national_id, name=name, last_name=last_name, age=age, 
 								origin_planet=origin_planet, picture_url=picture_url)
 			
@@ -53,10 +50,11 @@ def addPerson(request):
 			response = json.dumps([{'Error':'Status 500 INTERNAL SERVER ERROR'}])
 			status   = 500
 	else:
-		response 	 = json.dumps([{'Error':'Status 400 Bad Request'}])
+		response 	 = json.dumps([{'Error':'Status 400 BAD REQUEST'}])
 		status 		 = 400
 	
 	return HttpResponse(response, status=status ,content_type='text/json')
+
 
 
 
@@ -71,9 +69,9 @@ def getPersonById(request, national_id):
 									'last_name':person.last_name , 'age':person.age, 
 									'origin_planet':person.origin_planet, 'picture_url':person.picture_url}]) 
 			status    = 200
-		#If any error raises when saving to DB..
+		#If any exception raises when saving to DB..
 		except:
-			response  = json.dumps([{'Error':'Status 404'}])
+			response  = json.dumps([{'Error':'Status 404 NOT FOUND'}])
 			status 	  = 404
 
 	return HttpResponse(response, status=status, content_type='text/json')
@@ -126,15 +124,15 @@ def updatePerson(request, national_id):
 			status   	 = 200
 		except Person.DoesNotExist:
 			#If person doesn't exist:
-			response 	 = json.dumps([{'Error':'Status 404'}])
+			response 	 = json.dumps([{'Error':'Status 404 NOT FOUND'}])
 			status   	 = 404
 		finally:
-			# On any other errors:
+			# On any other errors set status to 500:
 			if not response:
 				response = json.dumps([{'Error':'Status 500'}])
 				status   = 500
 	else:
-		response 		 = json.dumps([{'Error':'Status 400 Bad Request'}])
+		response 		 = json.dumps([{'Error':'Status 400 BAD REQUEST'}])
 		status 		 	 = 400
 
 	return HttpResponse(response, status=status, content_type='text/json')	
@@ -151,14 +149,14 @@ def deletePerson(request, national_id):
 			person   = Person.objects.get(national_id=national_id)
 			# Updates a person based on national_id and a json
 			person.delete()
-			response = json.dumps([{'Success':'Status 200'}])
+			response = json.dumps([{'Success':'Status 200 OK'}])
 			status   = 200
 		except Person.DoesNotExist:
 			#If person doesn't exist:
-			response = json.dumps([{'Error':'Status 404'}])
+			response = json.dumps([{'Error':'Status 404 NOT FOUND'}])
 			status   = 404
 		finally:
-			# On any other errors:
+			# On any other errors set status to 500:
 			if not response:
 				response = json.dumps([{'Error':'Status 500 INTERNAL SERVER ERROR'}])
 				status   = 500
