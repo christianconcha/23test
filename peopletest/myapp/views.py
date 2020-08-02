@@ -71,6 +71,7 @@ def getPersonById(request, national_id):
 
 
 
+
 def getAllPeople(request):
 	logger.debug("getAllPeople")
 	# Creates a non-empty response 
@@ -87,6 +88,8 @@ def getAllPeople(request):
 			response      = json.dumps([{'Error':'Status 404'}])
 	
 	return HttpResponse(response, content_type='application/json')	
+
+
 
 
 def updatePerson(request, national_id):
@@ -108,43 +111,45 @@ def updatePerson(request, national_id):
 		try:
 			# Looks for a person based on national_id 
 			person       = Person.objects.get(national_id=national_id)
-			if person:
-				# Updates a person based on national_id and a json
-				Person.objects.filter(national_id=national_id).update(national_id=nat_id, 
-															     	  name=name, last_name=last_name , age=age, 
-															     	  origin_planet=origin_planet, picture_url=picture_url)
-				response = json.dumps([{'Success':'Status 200'}])
-			else:
-				#If person doesn't exist:
-				response = json.dumps([{'Error':'Status 404'}])	
-		except:
+			# Updates a person based on national_id and a json
+			Person.objects.filter(national_id=national_id).update(national_id=nat_id, 
+														     	  name=name, last_name=last_name , age=age, 
+														     	  origin_planet=origin_planet, picture_url=picture_url)
+			response = json.dumps([{'Success':'Status 200'}])
+		except Person.DoesNotExist:
+			#If person doesn't exist:
+			response = json.dumps([{'Error':'Status 404'}])
+		else:
 			# On any other errors:
-			response     = json.dumps([{'Error':'Status 500'}])
+			response = json.dumps([{'Error':'Status 500'}])
 
 	return HttpResponse(response, content_type='text/json')	
+
+
 
 
 def deletePerson(request, national_id):
 	logger.debug("deletePerson")
 	# Creates a non-empty response 
 	response = json.dumps([{"Error":"deletePerson"}])
-	
+
 	if request.method=='DELETE':
 		try:
 			# Looks for a person based on national_id 
-			person       = Person.objects.get(national_id=national_id)
-			if person:
-				# Updates a person based on national_id and a json
-				person.delete()
-				response = json.dumps([{'Success':'Status 200'}])
-			else:
-				#If person doesn't exist:
-				response = json.dumps([{'Error':'Status 404'}])	
-		except:
+			person   = Person.objects.get(national_id=national_id)
+			# Updates a person based on national_id and a json
+			person.delete()
+			response = json.dumps([{'Success':'Status 200'}])
+		except Person.DoesNotExist:
+			#If person doesn't exist:
+			response = json.dumps([{'Error':'Status 404'}])
+		else:
 			# On any other errors:
-			response     = json.dumps([{'Error':'Status 500'}])
+			response = json.dumps([{'Error':'Status 500'}])
 
 	return HttpResponse(response, content_type='text/json')	
+
+
 		
 
 
