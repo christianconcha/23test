@@ -21,8 +21,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     #path('', views.index),
     path('post/people',views.addPerson),
-    path('people/<str:national_id>',views.getPersonById),
+    path('get/people/<str:national_id>',views.getPersonById),
     path('get/people',views.getAllPeople),
-    
+    path('put/people/<str:national_id>',views.updatePerson)
+
 
 ]
