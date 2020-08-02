@@ -23,7 +23,8 @@ urlpatterns = [
     path('post/people',views.addPerson),
     path('get/people/<str:national_id>',views.getPersonById),
     path('get/people',views.getAllPeople),
-    path('put/people/<str:national_id>',views.updatePerson)
+    path('put/people/<str:national_id>',views.updatePerson),
+    path('delete/people/<str:national_id>',views.deletePerson),
 
 
 ]
