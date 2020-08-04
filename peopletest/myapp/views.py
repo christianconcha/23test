@@ -16,10 +16,10 @@ logger = logging.getLogger('views.py')
 def index(request):
 	# Index view. It displays all path available :
 	response = json.dumps([{'Creates a person based on a json':'/post/people', 
-							'Retrieves a person by their national_id':'/get/people/"national_id"',
+							'Retrieves a person by their national_id':'/get/people/{national_id}',
 							'Retrieves all data in DB':'/get/people',
-							'Updates a person data by their national_id':'/put/people/"national_id"',
-							'Deletes a person by national_id':'/delete/people/"national_id"'
+							'Updates a person data by their national_id':'/put/people/{national_id}',
+							'Deletes a person by national_id':'/delete/people/{national_id}'
 							}])
 	return HttpResponse(response, status= 200, content_type='application/json')
 
@@ -45,12 +45,18 @@ def addPerson(request):
 								origin_planet=origin_planet, picture_url=picture_url)
 			
 		try:
-			#Attempts to save data to DB
-			person.save()
-			#Confirms object saved
-			response = json.dumps(json_payload)
-			# Setup http status code
-			status   = 201
+			# Searches if that new person already exists
+			if not Person.objects.filter(national_id=national_id):
+				#Attempts to save data to DB
+				person.save()
+				#Confirms object saved
+				response = json.dumps(json_payload)
+				# Setup http status code
+				status   = 201
+			else:
+				response = json.dumps("Person already exists [national_id duplicated alert], try again")
+				# Setup http status code
+				status   = 200
 		#If any error raises when saving to DB..
 		except:
 			response = json.dumps([{'Error':'Status 500 INTERNAL SERVER ERROR'}])
