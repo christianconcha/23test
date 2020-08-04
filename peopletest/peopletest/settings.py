@@ -25,7 +25,7 @@ SECRET_KEY = '(1iq1&zf-je=#vzq$ch)fdq+ck9k3*mad42abti(#!n@aa=l!+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['proyecto-api-285220.uc.r.appspot.com']
+ALLOWED_HOSTS = ['proyecto-api-285220.uc.r.appspot.com','127.0.0.1']
 
 
 # Application definition

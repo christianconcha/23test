@@ -16,7 +16,7 @@ logger = logging.getLogger('views.py')
 def index(request):
 	# Index view, displays an empty json:
 	response = json.dumps([{}])
-	return HttpResponse(response, status= 200,content_type='text/json')
+	return HttpResponse(response, status= 200, content_type='application/json')
 
 
 
@@ -53,7 +53,7 @@ def addPerson(request):
 		response 	 = json.dumps([{'Error':'Status 400 BAD REQUEST'}])
 		status 		 = 400
 	
-	return HttpResponse(response, status=status ,content_type='text/json')
+	return HttpResponse(response, status=status, content_type='application/json')
 
 
 
@@ -74,7 +74,7 @@ def getPersonById(request, national_id):
 			response  = json.dumps([{'Error':'Status 404 NOT FOUND'}])
 			status 	  = 404
 
-	return HttpResponse(response, status=status, content_type='text/json')
+	return HttpResponse(response, status=status, content_type='application/json')
 
 
 
@@ -101,6 +101,8 @@ def getAllPeople(request):
 
 def updatePerson(request, national_id):
 	logger.debug("updatePerson")
+
+	response=[]
 	
 	if request.method=='PUT' and request.content_type == 'application/json':
 		# Gets json payload from request
@@ -122,27 +124,29 @@ def updatePerson(request, national_id):
 														     	  origin_planet=origin_planet, picture_url=picture_url)
 			response 	 = json.dumps(json_payload)
 			status   	 = 200
+
 		except Person.DoesNotExist:
 			#If person doesn't exist:
 			response 	 = json.dumps([{'Error':'Status 404 NOT FOUND'}])
 			status   	 = 404
-		finally:
+			print("hola")
+		except:
 			# On any other errors set status to 500:
 			if not response:
-				response = json.dumps([{'Error':'Status 500'}])
+				response = json.dumps([{'Error':'Status 500 INTERNAL SERVER ERROR'}])
 				status   = 500
 	else:
 		response 		 = json.dumps([{'Error':'Status 400 BAD REQUEST'}])
 		status 		 	 = 400
 
-	return HttpResponse(response, status=status, content_type='text/json')	
+	return HttpResponse(response, status=status, content_type='application/json')	
 
 
 
 
 def deletePerson(request, national_id):
 	logger.debug("deletePerson")
-
+	response = []
 	if request.method=='DELETE':
 		try:
 			# Looks for a person based on national_id 
@@ -155,13 +159,13 @@ def deletePerson(request, national_id):
 			#If person doesn't exist:
 			response = json.dumps([{'Error':'Status 404 NOT FOUND'}])
 			status   = 404
-		finally:
+		except:
 			# On any other errors set status to 500:
 			if not response:
 				response = json.dumps([{'Error':'Status 500 INTERNAL SERVER ERROR'}])
 				status   = 500
 
-	return HttpResponse(response, status=status, content_type='text/json')	
+	return HttpResponse(response, status=status, content_type='application/json')	
 
 
 		
