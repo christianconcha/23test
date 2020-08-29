@@ -56,7 +56,7 @@ def addPerson(request):
 			else:
 				response = json.dumps("Person already exists [national_id duplicated alert], try again")
 				# Setup http status code
-				status   = 200
+				status   = 409
 		#If any error raises when saving to DB..
 		except:
 			response = json.dumps([{'Error':'Status 500 INTERNAL SERVER ERROR'}])
