@@ -14,7 +14,7 @@ logger = logging.getLogger('views.py')
 # Create your views here.
 
 def index(request):
-	# Index view. It displays all path available :
+	# Index view. It displays all available paths  :
 	response = json.dumps([{'Creates a person based on a json':'/post/people', 
 							'Retrieves a person by their national_id':'/get/people/{national_id}',
 							'Retrieves all data in DB':'/get/people',
